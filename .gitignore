@@ -1,3 +1,5 @@
-config/configuration.yaml
-config/phue.conf
-config/plex.conf
+config/*
+~config/README.md
+#config/configuration.yaml
+#config/phue.conf
+#config/plex.conf

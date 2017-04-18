@@ -9,4 +9,4 @@ services:
     #  - "8123:8123"
     network_mode: "host"
     volumes:
-      - ./conf:/root/.homeassistant
+      - ./config:/root/.homeassistant

@@ -1,0 +1,235 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: 33.9947717
+  longitude: -118.4338
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 18
+  # metric for Metric, imperial for Imperial
+  unit_system: imperial
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: America/Los_Angeles
+  temperature_unit: F
+  customize:
+    sun:
+      hidden: true
+    light.door_light:
+      hidden: true
+    light.table_lamp:
+      hidden: true
+    light.desk_lamp:
+      hidden: true
+    light.corner_lamp:
+      hidden: true
+    sensor.speedtest_download:
+      icon: mdi:download
+      friendly_name: Download
+    sensor.speedtest_upload:
+      icon: mdi:upload
+      friendly_name: Upload
+    sensor.speedtest_ping:
+      icon: mdi:timer
+      friendly_name: Ping
+    light.living_room:
+      friendly_name: Lamps
+    sensor.humidity:
+      icon: mdi:water-percent
+    light.bedroom:
+      friendly_name: Lamps
+    sensor.yr_symbol:
+      friendly_name: Weather
+    sensor.yr_temperature:
+      friendly_name: Temp
+    sensor.yr_humidity:
+      friendly_name: Humidity
+      icon: mdi:water-percent
+    sensor.ICANN:
+      icon: mdi:car
+    sensor.Palisades:
+      icon: mdi:car
+
+# Show links to resources in log and frontend
+#introduction:
+
+# Enables the frontend
+frontend:
+
+http:
+  # Uncomment this to add a password (recommended!)
+  api_password: 073034eaf6cffb9f553f25e5d9664b63
+  #ssl_certificate: 
+  #ssl_key: 
+  # Uncomment this if you are using SSL or running in Docker etc
+  # base_url: example.duckdns.org:8123
+  trusted_networks:
+    - 127.0.0.1
+    - ::1
+    - 192.168.10.0/24
+    - 192.168.20.0/24
+
+# Checks for available updates
+updater:
+
+# Discover some devices automatically
+discovery:
+
+light:
+  platform: hue
+  host: 192.168.10.101
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+media_player 1:
+  - platform: soundtouch
+    host: 192.168.10.106
+    name: Soundtouch Bedroom
+
+media_player 2:
+  - platform: plex
+    name: Complexity
+    host: 192.168.10.119
+    port: 32400
+
+#mqtt sensors, thermostat and aquarium
+mqtt:
+
+# Enables support for tracking state changes over time.
+history:
+
+# View all events in a logbook
+logbook:
+
+weather:
+
+# Track the sun
+sun:
+
+# Weather Prediction
+sensor:
+  - platform: yr
+    name: outside
+    monitored_conditions:
+      - temperature
+      - humidity
+      - symbol
+  - platform: xbox_live
+    api_key: 9d17e6b8c98d89140b8f1a40f3f8e3ffe86c29c7
+    xuid:
+      - 2533274810607842
+  - platform: mqtt
+    state_topic: "home/livingroom/sensor1"
+    name: "Temperature"
+    unit_of_measurement: '°F'
+    value_template: '{{ value_json.temperature }}'
+  - platform: mqtt
+    state_topic: "home/livingroom/sensor1"
+    name: "Humidity"
+    unit_of_measurement: '%'
+    value_template: '{{ value_json.humidity }}'
+  - platform: speedtest
+    monitored_conditions:
+      - ping
+      - download
+      - upload
+  - platform: google_travel_time
+    name: ICANN
+    api_key: AIzaSyBdSk8uesWldzY9JesrbBENJbPvBh67lao
+    origin: 1140 Venice Blvd, Venice CA 90291 
+    destination: 12025 E Waterfront Dr, Los Angeles, CA 90094
+  - platform: google_travel_time
+    name: Palisades
+    api_key: AIzaSyBdSk8uesWldzY9JesrbBENJbPvBh67lao
+    origin: 1140 Venice Blvd, Venice CA 90291
+    destination: Pacific Palisades, CA
+  - platform: transmission
+    host: 192.168.10.119
+    username: control
+    password: KDYAf18EMI5YGBkFMEqQ
+    monitored_variables:
+      - 'current_status'
+      - 'download_speed'
+      - 'upload_speed'
+
+# Text to speech
+tts:
+  platform: google
+
+automation:
+  - alias: Turn on Living Room Lights at sunset
+    initial_state: 'on'
+    trigger:
+      platform: sun
+      event: sunset
+      offset: "-00:30:00"
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: group.all_devices
+          state: home
+        - condition: time
+          weekday:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+    action:
+      service: scene.turn_on
+      entity_id:  scene.Livingroom_normal
+
+scene:
+  - name: Livingroom normal
+    entities:
+       light.living_room:
+         state: on
+         transition: 2
+         brightness: 255
+  - name: Livingroom dim
+    entities:
+       light.living_room:
+         state: on
+         transition: 2
+         brightness: 100
+
+group: 
+  Network:
+    entities:
+      - sensor.speedtest_upload
+      - sensor.speedtest_download
+      - sensor.speedtest_ping
+  Torrents:
+    entities:
+      - sensor.transmission_down_speed
+      - sensor.transmission_up_speed
+      - sensor.transmission_status
+  Living Room:
+    entities:
+      - light.living_room
+      - sensor.temperature
+      - sensor.humidity
+  Bedroom:
+    entities:
+      - light.bedroom
+  Outside:
+    entities:
+      - sensor.yr_symbol
+      - sensor.yr_temperature
+      - sensor.yr_humidity
+  Traffic:
+    entities:
+      - sensor.ICANN
+      - sensor.Palisades
+
+recorder:
+  exclude:
+    entities:
+      - sensor.yr_symbol
+      - sensor.yr_temperature
+      - sensor.yr_humidity
+      - sensor.speedtest_ping
+      - sensor.ICANN
+      - sensor.Palisades
+      - sun

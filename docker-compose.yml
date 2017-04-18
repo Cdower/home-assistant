@@ -3,6 +3,6 @@ services:
   build: ./
   homeassistant:
     ports:
-      - "8123":"8123"
+      - "8123:8123"
     volumes:
       - ./conf:/root/.homeassistant

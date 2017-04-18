@@ -5,4 +5,4 @@ services:
     ports:
       - "8123":"8123"
     volumes:
-      - ./homeassistant:/root/.homeassistant
+      - ./conf:/root/.homeassistant

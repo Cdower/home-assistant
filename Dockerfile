@@ -8,3 +8,6 @@ RUN apk update \
   && pip3 install --upgrade pip setuptools \
   && rm -r /root/.cache \
   && pip3 install homeassistant
+
+VOLUME /root/.homeassistant
+CMD hass --open-ui

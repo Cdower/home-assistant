@@ -1,0 +1,8 @@
+version: "3"
+services:
+  build: ./
+  homeassistant:
+    ports:
+      - "8123":"8123"
+    volumes:
+      - ./homeassistant:/root/.homeassistant

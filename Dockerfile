@@ -1,14 +1,8 @@
-FROM alpine
+FROM  homeassistant/home-assistant
 MAINTAINER cdower
 
-RUN apk update \
-  && apk add python3 py3-pip python3-dev \
-  && python3 -m ensurepip \
-  && rm -r /usr/lib/python*/ensurepip \
-  && pip3 install --upgrade pip setuptools \
-  && pip3 install --upgrade virtualenv \
-  && rm -r /root/.cache \
-  && pip3 install homeassistant
-
-VOLUME /root/.homeassistant
-CMD hass --open-ui
+RUN apt-get update \
+  && apt-get install swig libssl-dev python-dev libusb-1.0-0 python-yaml \
+  && pip install flask \
+  && pip install https://pypi.python.org/packages/source/M/M2Crypto/M2Crypto-0.24.0.tar.gz \
+  && pip install firetv[firetv-server]
